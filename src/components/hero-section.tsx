@@ -2,14 +2,21 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
+import Spline from "@splinetool/react-spline";
+
+
 
 export const HeroSection: React.FC = () => {
   return (
     <div className="min-h-screen bg-primary relative">
       <BackgroundRippleEffect />
       
+
+      
+      
       {/* Top Bar */}
       <div className="absolute top-8 left-4 right-4 z-10">
+        
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-sidebar-foreground rounded-full"></div>
@@ -25,11 +32,12 @@ export const HeroSection: React.FC = () => {
           
           <Button 
             variant="outline" 
-            className="border-sidebar-foreground text-sidebar-foreground hover:bg-sidebar-foreground hover:text-sidebar uppercase text-sm font-poppins tracking-wider"
+            className="border-sidebar-foreground text-sidebar-foreground hover:bg-sidebar-foreground hover:text-sidebar uppercase text-sm font-poppins tracking-wider z-20"
           >
             CONTACT NOW
           </Button>
         </div>
+        
       </div>
 
       {/* Main Title - Bottom Left */}
@@ -41,6 +49,22 @@ export const HeroSection: React.FC = () => {
           MEDIA
         </h2>
       </div>
+
+      {/* Spline 3D Scene - Right Half */}
+      <div className="absolute top-0 right-0 w-1/2 h-full z-10">
+        <Spline 
+          scene="https://prod.spline.design/fK3RM9r34n-jdzEd/scene.splinecode"
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+          }}
+        />
+      </div>
+
+
     </div>
   );
 };
