@@ -3,8 +3,8 @@ import React, { useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export const BackgroundRippleEffect = ({
-  rows = 6,
-  cols = 13,
+  rows = 7,
+  cols = 15,
   cellSize = 120,
 }: {
   rows?: number;
