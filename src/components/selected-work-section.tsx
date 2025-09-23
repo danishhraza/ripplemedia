@@ -2,14 +2,22 @@
 import React, { useState } from "react";
 import { motion, useInView, useScroll, useTransform } from "motion/react";
 
+// Card type for grid items
+type Card = {
+  id: number | string;
+  content: React.ReactNode;
+  className?: string;
+  title?: string;
+};
+
 // Custom Layout Grid Component
-const LayoutGrid = ({ cards }: { cards: any[] }) => {
-  const [selected, setSelected] = useState<any | null>(null);
+const LayoutGrid: React.FC<{ cards: Card[] }> = ({ cards }) => {
+  const [selected, setSelected] = useState<Card | null>(null);
 
   return (
     <div className="w-full h-full">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[800px]">
-        {cards.map((card, i) => (
+        {cards.map((card) => (
           <motion.div
             key={card.id}
             className={`${card.className} relative overflow-hidden rounded-xl cursor-pointer bg-white shadow-lg hover:shadow-2xl transition-all duration-300`}
