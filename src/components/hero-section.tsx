@@ -25,7 +25,7 @@ export const HeroSection: React.FC = () => {
       </div>
 
       {/* Primary vignette overlay above video, below grid */}
-      <div className="absolute inset-0 z-[2] pointer-events-none vignette-primary opacity-30 md:opacity-70" />
+      <div className="absolute inset-0 z-[2] pointer-events-none vignette-primary opacity-50 md:opacity-70" />
 
 
       

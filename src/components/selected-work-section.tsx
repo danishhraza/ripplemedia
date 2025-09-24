@@ -8,11 +8,55 @@ type Card = {
   content: React.ReactNode;
   className?: string;
   title?: string;
+  videoUrl?: string; // direct URL for video (used for both preview and modal)
+};
+
+// Simple Video Player Component using direct URLs
+const VideoPlayer: React.FC<{ 
+  videoUrl?: string; 
+  autoplay?: boolean;
+  muted?: boolean;
+  showFullVideo?: boolean;
+}> = ({ videoUrl, autoplay = false, muted = true, showFullVideo = false }) => {
+  // Determine video type based on file extension
+  const videoType = videoUrl?.toLowerCase().endsWith('.MOV') ? 'video/quicktime' : 'video/mp4';
+
+  if (!videoUrl) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-lg">
+        <div className="text-center">
+          <p className="text-sm text-gray-600">No video available</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <video
+      className={`${showFullVideo
+        ? "max-h-[85vh] max-w-[95vw] w-auto h-auto object-contain"
+        : "w-full h-full object-cover"
+      } rounded-lg bg-black`}
+      autoPlay={autoplay}
+      loop
+      muted={muted}
+      playsInline
+      controls={showFullVideo}
+      preload={autoplay ? "auto" : "metadata"}
+    >
+      <source src={videoUrl} type={videoType} />
+      <p className="text-red-500">Your browser doesn&apos;t support video playback.</p>
+    </video>
+  );
 };
 
 // Custom Layout Grid Component
 const LayoutGrid: React.FC<{ cards: Card[] }> = ({ cards }) => {
   const [selected, setSelected] = useState<Card | null>(null);
+
+  const handleCardClick = (card: Card) => {
+    setSelected(selected === card ? null : card);
+  };
 
   return (
     <div className="w-full h-full">
@@ -22,7 +66,7 @@ const LayoutGrid: React.FC<{ cards: Card[] }> = ({ cards }) => {
             key={card.id}
             className={`${card.className} relative overflow-hidden rounded-xl cursor-pointer bg-white shadow-lg hover:shadow-2xl transition-all duration-300`}
             whileHover={{ scale: 1.02 }}
-            onClick={() => setSelected(selected === card ? null : card)}
+            onClick={() => handleCardClick(card)}
           >
             {card.content}
             {card.title && (
@@ -34,20 +78,40 @@ const LayoutGrid: React.FC<{ cards: Card[] }> = ({ cards }) => {
         ))}
       </div>
 
+      {/* Modal for selected video */}
       {selected && (
         <motion.div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 overflow-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           onClick={() => setSelected(null)}
         >
           <motion.div
-            className="bg-white rounded-xl p-4 max-w-4xl max-h-[90vh] overflow-auto"
+            className="relative w-auto max-w-[95vw] max-h-[90vh]"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {selected.content}
+            {/* Close button */}
+            <button
+              onClick={() => setSelected(null)}
+              className="absolute -top-12 right-0 text-white text-2xl hover:text-gray-300 z-10"
+            >
+              ✕
+            </button>
+            
+            {/* Full video with controls */}
+            {selected.videoUrl ? (
+              <VideoPlayer
+                videoUrl={selected.videoUrl}
+                showFullVideo={true}
+                muted={false}
+              />
+            ) : (
+              <div className="bg-white rounded-xl p-8">
+                {selected.content}
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}
@@ -55,35 +119,32 @@ const LayoutGrid: React.FC<{ cards: Card[] }> = ({ cards }) => {
   );
 };
 
-// Video data - replace with your actual videos
-const videos = [
+// Video data using direct videoUrl for everything (dummy URLs for now)
+const videos: Card[] = [
   {
     id: 1,
     content: (
-      <div className="w-full h-full">
-        <video
-          className="w-full h-full object-cover rounded-lg"
-          autoPlay
-          loop
-          muted
-          playsInline
-        >
-          <source src="/videos/banner.MOV" />
-        </video>
-      </div>
+      <VideoPlayer
+        videoUrl="/videos/banner.MOV"
+        autoplay={true}
+      />
     ),
     className: "md:col-span-2 md:row-span-2",
     title: "Featured Project",
+    videoUrl: "/videos/banner.MOV",
   },
   {
     id: 2,
     content: (
-      <div className="w-full h-full bg-gradient-to-br from-orange-400 to-yellow-400 rounded-lg flex items-center justify-center">
-        <p className="font-bold text-white text-lg">Coming Soon</p>
-      </div>
+      <VideoPlayer
+        videoUrl="/videos/banner.MOV"
+        autoplay={true}
+      />
     ),
     className: "col-span-1",
     title: "Project 2",
+    videoUrl: "/videos/banner.MOV",
+    // No videoKey/previewUrl for "Coming Soon" cards
   },
   {
     id: 3,
@@ -94,24 +155,21 @@ const videos = [
     ),
     className: "col-span-1",
     title: "Project 3",
+    // No videoKey/previewUrl for "Coming Soon" cards
   },
 ];
 
 export const SelectedWorkSection: React.FC = () => {
   const ref = React.useRef(null);
-  // Trigger animations earlier: expand root with positive top margin and require only 10% visibility
   const isInView = useInView(ref, {
     once: true,
     amount: 0.1,
-    // rootMargin: top right bottom left -> start earlier and don't require deep scroll
     margin: "200px 0px -20% 0px",
   });
 
-  // Scroll progress for the word "Work" only, finish quickly over a small scroll range
   const workRef = React.useRef<HTMLSpanElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: workRef,
-    // Complete highlight between when the word is near the bottom and slightly higher in the viewport
     offset: ["start 95%", "start 10%"],
   });
   const bgSize = useTransform(scrollYProgress, [0, 1], ["0% 100%", "100% 100%"]);
@@ -141,7 +199,7 @@ export const SelectedWorkSection: React.FC = () => {
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "left center",
                 display: "inline-block",
-                backgroundSize: bgSize, // controlled by scroll
+                backgroundSize: bgSize,
               }}
             >
               Work

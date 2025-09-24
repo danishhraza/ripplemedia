@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.895.0",
+    "@aws-sdk/s3-request-presigner": "^3.895.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@splinetool/react-spline": "^4.1.0",
     "@splinetool/runtime": "^1.10.64",

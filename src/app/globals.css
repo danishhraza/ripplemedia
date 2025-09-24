@@ -157,6 +157,10 @@
 }
 
 @layer utilities {
+  /* Hide scrollbars cross-browser */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
   .font-coolvetica {
     font-family: 'Coolvetica', Arial, sans-serif;
   }
