@@ -41,7 +41,7 @@ export const ServicesSection: React.FC = () => {
   const railRef = useRef<HTMLDivElement | null>(null);
   const sectionRef = useRef<HTMLElement | null>(null);
 
-  // Horizontal scroll hook with proper section-based activation
+  // Simple horizontal scroll with fixed boundary detection
   useEffect(() => {
     const el = railRef.current;
     const section = sectionRef.current;
@@ -49,43 +49,41 @@ export const ServicesSection: React.FC = () => {
       const onWheel = (e: WheelEvent) => {
         if (e.deltaY === 0) return;
         
-        // Check if section is properly centered/fully visible
+        // Check if section is in viewport
         const rect = section.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
         
-        // Only activate horizontal scroll when section is mostly centered on screen
-        // This prevents glitchy behavior when scrolling into/out of section
-        const isSectionCentered = rect.top <= viewportHeight * 0.1 && rect.bottom >= viewportHeight * 0.9;
+        // Only activate when section is well within viewport
+        const isSectionActive = rect.top <= viewportHeight * 0.2 && rect.bottom >= viewportHeight * 0.8;
         
-        if (!isSectionCentered) {
-          // Let normal vertical scrolling happen when section isn't centered
+        if (!isSectionActive) {
           return;
         }
         
-        // Check if we're at the horizontal boundaries
-        const isAtStart = el.scrollLeft === 0;
-        const isAtEnd = Math.round(el.scrollLeft) >= el.scrollWidth - el.clientWidth;
+        // Check horizontal boundaries with proper calculation
+        const scrollLeft = el.scrollLeft;
+        const scrollWidth = el.scrollWidth;
+        const clientWidth = el.clientWidth;
+        const maxScroll = scrollWidth - clientWidth;
         
-        // Handle horizontal scrolling only when we have space to scroll
-        // Allow vertical scrolling when at boundaries
+        const isAtStart = scrollLeft <= 2;
+        const isAtEnd = scrollLeft >= maxScroll - 2;
+        
+        // At start boundary, allow scrolling up to previous section
         if (isAtStart && e.deltaY < 0) {
-          // At start, scrolling up - allow vertical scroll to previous section
           return;
         }
         
+        // At end boundary, allow scrolling down to next section  
         if (isAtEnd && e.deltaY > 0) {
-          // At end, scrolling down - allow vertical scroll to next section
           return;
         }
         
-        // We're in the middle or scrolling away from boundaries - do horizontal scroll
+        // In middle or scrolling into the content - do horizontal scroll
         e.preventDefault();
-        
-        // Use scrollBy for immediate, reliable scrolling
-        el.scrollBy(e.deltaY * 0.3, 0);
+        el.scrollBy(e.deltaY * 0.5, 0);
       };
       
-      // Add listener to document to capture scroll anywhere on page
       document.addEventListener("wheel", onWheel, { passive: false });
       return () => document.removeEventListener("wheel", onWheel);
     }
