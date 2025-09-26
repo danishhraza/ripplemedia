@@ -125,13 +125,13 @@ const videos: Card[] = [
     id: 1,
     content: (
       <VideoPlayer
-        videoUrl="/videos/banner.MOV"
+        videoUrl="https://dvb3gr8ptb8kd.cloudfront.net/videos/fluxad.mp4"
         autoplay={true}
       />
     ),
     className: "md:col-span-2 md:row-span-2",
     title: "Featured Project",
-    videoUrl: "/videos/banner.MOV",
+    videoUrl: "https://dvb3gr8ptb8kd.cloudfront.net/videos/fluxad.mp4",
   },
   {
     id: 2,

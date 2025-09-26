@@ -42,7 +42,7 @@ const iconVariants = {
 
 export const FloatingIconsSection: React.FC = () => {
   return (
-    <section className="relative py-6 md:py-16 bg-primary mx-4 md:mx-36 rounded-3xl overflow-hidden mb-11">
+    <section className="relative py-6 md:py-16 bg-primary mx-4 md:mx-36 rounded-3xl overflow-hidden">
       <div className="mx-auto max-w-7xl px-6 md:px-8">
         {/* Section Header */}
         <div className="text-left md:text-center mb-10 p-6">
