@@ -2,7 +2,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
-import Spline from "@splinetool/react-spline";
 
 
 
@@ -69,19 +68,7 @@ export const HeroSection: React.FC = () => {
         </h2>
       </div>
 
-      {/* Spline 3D Scene - Right Half (hidden on small screens) */}
-      <div className="hidden md:block absolute top-0 right-0 w-1/2 h-full z-10">
-        <Spline 
-          scene="https://prod.spline.design/fK3RM9r34n-jdzEd/scene.splinecode"
-          style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-          }}
-        />
-      </div>
+
 
 
     </div>
