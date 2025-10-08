@@ -164,6 +164,48 @@
   .font-coolvetica {
     font-family: 'Coolvetica', Arial, sans-serif;
   }
+  .font-editorial {
+    font-family: var(--font-editorial), var(--font-serif);
+    font-weight: 200; /* Spectral Extra Light */
+    font-style: italic;
+  }
+
+  /* Subtle animated noise overlay */
+  .noise-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+      /* Subtle grain: single noise texture + slight movement */
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAATklEQVR4Ae3SsQkAMAgEwZ3/p1uQmEAGlqTgUvwK6EAgAAAAAAAAAG4F2fZy7zWc7s4+7rVrqHn0bS9b3RtL1vdG0vW90bS9b3RtL1v9AcxgBQ0H1dEAAAAASUVORK5CYII=");
+      background-size: 260px 260px; /* a bit finer */
+      mix-blend-mode: multiply;
+      opacity: 0.10; /* subtle but visible */
+      animation: noiseShift 18s steps(12) infinite;
+      z-index: 5;
+  }
+
+  /* Stronger noise option (add alongside .noise-overlay if needed) */
+  .noise-overlay-strong {
+      opacity: 0.18;
+      mix-blend-mode: overlay;
+  }
+
+  /* Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .noise-overlay,
+    .noise-overlay-strong { animation: none; }
+  }
+
+  @keyframes noiseShift {
+    0% { background-position: 0 0; }
+    100% { background-position: -512px 512px; }
+  }
+
+  @layer utilities {
+  .w-fluid {
+    width: clamp(230px, 22vw + 5rem, 400px);
+  }
+}
   
   
   .animate-blob {
