@@ -23,9 +23,9 @@ export const BackgroundRippleEffect = ({
       ref={ref}
       className={cn(
         "absolute inset-0 h-full w-full",
-        // Make grid lines more visible: stronger contrast + transparent fill so only lines show.
-        "[--cell-border-color:rgba(0,0,0,0.35)] [--cell-fill-color:transparent] [--cell-shadow-color:rgba(0,0,0,0.45)]",
-        "dark:[--cell-border-color:rgba(255,255,255,0.20)] dark:[--cell-fill-color:transparent] dark:[--cell-shadow-color:rgba(255,255,255,0.12)]",
+  // Visible grid lines + subtle fill retained so ripple opacity animation shows.
+  "[--cell-border-color:rgba(0,0,0,0.35)] [--cell-fill-color:rgba(0,0,0,0.04)] [--cell-shadow-color:rgba(0,0,0,0.45)]",
+  "dark:[--cell-border-color:rgba(255,255,255,0.25)] dark:[--cell-fill-color:rgba(255,255,255,0.05)] dark:[--cell-shadow-color:rgba(255,255,255,0.12)]",
       )}
     >
       <div className="relative h-auto w-auto overflow-hidden">
@@ -114,8 +114,8 @@ const DivGrid = ({
           <div
             key={idx}
             className={cn(
-              // Increased border width & base opacity for clearer lines
-              "cell relative border border-solid opacity-60 transition-opacity duration-150 will-change-transform hover:opacity-90 dark:shadow-[0px_0px_40px_1px_var(--cell-shadow-color)_inset]",
+              // Border emphasized; slight fill kept so opacity animation (ripple) is perceptible.
+              "cell relative border border-solid opacity-55 transition-opacity duration-150 will-change-transform hover:opacity-90 dark:shadow-[0px_0px_40px_1px_var(--cell-shadow-color)_inset]",
               clickedCell && "animate-cell-ripple [animation-fill-mode:none]",
               !interactive && "pointer-events-none",
             )}

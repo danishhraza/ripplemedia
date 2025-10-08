@@ -58,8 +58,8 @@ export const HeroSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Title - Bottom Left */}
-      <div className="absolute bottom-8 left-6 md:left-8 z-10 text-left">
+      {/* Main Title - Bottom Left (non-selectable branding) */}
+      <div className="absolute bottom-8 left-6 md:left-8 z-10 text-left select-none">
         <h1 className="font-coolvetica text-8xl md:text-9xl lg:text-[14rem] text-primary font-normal tracking-wider leading-none italic">
           RIPPLE
         </h1>

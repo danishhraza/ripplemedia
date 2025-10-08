@@ -16,7 +16,7 @@ const lineClass = "font-normal text-black tracking-tight leading-[1] md:leading-
 
 export const ComputerVideoSection: React.FC = () => {
   return (
-    <section className="relative bg-neutral-100 py-24 overflow-hidden select-none">
+  <section className="relative bg-neutral-100 py-24 overflow-hidden">
       {/* SVG Grain overlay (fallback removed CSS noise for reliability) */}
   <GrainOverlay opacity={0.18} duration="11s" freqValues=".60;.63;.65;.67;.70;.66;.63;.60" animateSeed debugVisible />
   <div className="relative z-10 max-w-[1500px] mx-auto px-4">

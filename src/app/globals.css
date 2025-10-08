@@ -154,6 +154,15 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Global text selection colors */
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  ::-moz-selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
 }
 
 @layer utilities {
