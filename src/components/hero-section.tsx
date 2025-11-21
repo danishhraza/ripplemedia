@@ -6,10 +6,20 @@ import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect
 
 
 export const HeroSection: React.FC = () => {
+  const scrollToPricing = () => {
+    const pricingSection = document.getElementById('pricing');
+    if (pricingSection) {
+      pricingSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="h-svh bg-primary relative overflow-hidden">
-      <BackgroundRippleEffect />
-      
+      {/* Grid Pattern - Placed above video/vignette for visibility */}
+      <div className="absolute inset-0 z-[3]">
+        <BackgroundRippleEffect />
+      </div>
+
       {/* Background Video Layer (above green bg, below grid) */}
       <div className="absolute inset-0 z-[1] pointer-events-none">
         <video
@@ -27,33 +37,32 @@ export const HeroSection: React.FC = () => {
       <div className="absolute inset-0 z-[2] pointer-events-none vignette-primary opacity-50 md:opacity-70" />
 
 
-      
-      
+
+
       {/* Top Bar */}
       <div className="absolute top-8 left-4 right-4 z-10">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-sidebar-foreground rounded-full"></div>
-              <span className="text-sidebar-foreground uppercase text-sm font-poppins tracking-wider">
+              <span className="text-black bg-primary uppercase text-sm font-poppins tracking-wider">
                 Based in Austin, TX
               </span>
             </div>
             {/* Mobile-only contact button under location */}
-            <Button 
-              variant="outline" 
-              className="md:hidden border-sidebar-foreground text-sidebar-foreground hover:bg-sidebar-foreground hover:text-sidebar uppercase text-sm font-poppins tracking-wider z-20 w-max"
+            <Button
+              onClick={scrollToPricing}
+              className="md:hidden bg-primary text-black border-none hover:bg-primary/70 uppercase text-sm font-poppins tracking-wider z-20 w-max"
             >
-              CONTACT NOW
+              Book Now
             </Button>
           </div>
 
           {/* Desktop/tablet contact button on the right */}
-          <Button 
-            variant="outline" 
-            className="hidden md:inline-flex border-sidebar-foreground text-sidebar-foreground hover:bg-sidebar-foreground hover:text-sidebar uppercase text-sm font-poppins tracking-wider z-20"
+          <Button
+            onClick={scrollToPricing}
+            className="hidden md:inline-flex bg-primary text-black border-none hover:bg-primary/70 uppercase text-sm font-poppins tracking-wider z-20"
           >
-            CONTACT NOW
+            Book Now
           </Button>
         </div>
       </div>

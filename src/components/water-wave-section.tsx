@@ -1,227 +1,202 @@
 "use client";
 
-import React from "react";
-import { motion } from "motion/react";
+import React, { useRef, useState } from "react";
+import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
+import { Text, shaderMaterial, OrthographicCamera, useFBO } from "@react-three/drei";
+import * as THREE from "three";
+
+// --- Custom Shader Material ---
+const WaterRippleMaterial = shaderMaterial(
+  {
+    uTime: 0,
+    uMouse: new THREE.Vector2(0, 0),
+    uResolution: new THREE.Vector2(0, 0),
+    uTexture: null,
+  },
+  // Vertex Shader
+  `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  // Fragment Shader
+  `
+    uniform float uTime;
+    uniform vec2 uMouse;
+    uniform vec2 uResolution;
+    uniform sampler2D uTexture;
+    varying vec2 vUv;
+
+    void main() {
+      vec2 uv = vUv;
+      
+      // --- Wavy Top Edge ---
+      // Amplitude: 0.03, Frequency: 10.0, Speed: 0.8 (Slower)
+      // Base height: 0.9 (so it's near the top)
+      float waveHeight = 0.9 + 0.03 * sin(uv.x * 12.0 + uTime * 0.8);
+      
+      // Discard pixels above the wave to create the shape
+      if (uv.y > waveHeight) discard;
+
+      // --- Ripple Distortion ---
+      vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
+      vec2 mouseUV = uMouse * 0.5 + 0.5; 
+      vec2 distVec = (uv - mouseUV) * aspect;
+      float dist = length(distVec);
+
+      // Wave parameters
+      float wave = sin(dist * 40.0 - uTime * 5.0) * exp(-dist * 8.0);
+      float ambient = sin(uv.x * 10.0 + uTime) * cos(uv.y * 10.0 + uTime) * 0.005;
+      float strength = 0.03;
+      
+      vec2 distortedUV = uv + (distVec / (dist + 0.001)) * wave * strength + ambient;
+
+      // --- Colors ---
+      // Sample the FBO texture (the text/bubbles)
+      vec4 texColor = texture2D(uTexture, distortedUV);
+      
+      // Water Body Color: Transparent Green (Less Yellow)
+      // RGB: 0.1, 0.9, 0.2 (Vibrant Green)
+      vec4 waterColor = vec4(0.816, 0.996, 0.090, 0.85);
+      
+      // Border Color: Opaque Green
+      vec4 borderColor = vec4(0.1, 0.9, 0.2, 1.0);
+      
+      // Calculate Border Mask
+      // Thinner edge: 0.005 instead of 0.02
+      float borderMask = smoothstep(0.005, 0.0, waveHeight - uv.y);
+      
+      // Mix Water and Border
+      vec4 finalColor = mix(waterColor, borderColor, borderMask);
+      
+      // Composite with Text/Bubbles
+      // If text is present (alpha > 0), blend it in.
+      // We want the text to look submerged, so we keep the water tint on top.
+      vec3 mixedRGB = mix(finalColor.rgb, texColor.rgb, texColor.a * 0.9);
+      float mixedAlpha = max(finalColor.a, texColor.a);
+      
+      // Ensure border stays opaque
+      mixedAlpha = mix(mixedAlpha, 1.0, borderMask);
+
+      gl_FragColor = vec4(mixedRGB, mixedAlpha);
+    }
+  `
+);
+
+extend({ WaterRippleMaterial });
+
+// --- Scene Component ---
+const SceneContent = () => {
+  const { size, pointer, viewport } = useThree();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const materialRef = useRef<any>(null);
+  const planeRef = useRef<THREE.Mesh>(null);
+  const contentRef = useRef<THREE.Group>(null);
+  const renderTarget = useFBO();
+  const { gl, scene, camera } = useThree();
+
+  useFrame((state) => {
+    if (materialRef.current) {
+      materialRef.current.uTime = state.clock.elapsedTime;
+      materialRef.current.uMouse.lerp(pointer, 0.1);
+      materialRef.current.uResolution.set(size.width, size.height);
+    }
+
+    // --- Pass 1: Render Content to FBO ---
+    if (planeRef.current) planeRef.current.visible = false;
+    if (contentRef.current) contentRef.current.visible = true;
+
+    gl.setRenderTarget(renderTarget);
+    gl.clear(); // Clear FBO to transparent
+    gl.render(scene, camera);
+    gl.setRenderTarget(null);
+
+    // --- Pass 2: Render Water Plane to Screen ---
+    if (planeRef.current) planeRef.current.visible = true;
+    if (contentRef.current) contentRef.current.visible = false;
+
+    if (materialRef.current) {
+      materialRef.current.uTexture = renderTarget.texture;
+    }
+  });
+
+  return (
+    <>
+      {/* Content Group (Text + Bubbles) - Rendered to FBO */}
+      <group ref={contentRef}>
+        <Text
+          position={[0, 0, 0]}
+          fontSize={viewport.width > 6 ? 1 : 0.5}
+          color="black"
+          anchorX="center"
+          anchorY="middle"
+          // Using Inter font for stability
+          font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
+          fontWeight="bold"
+        >
+          Stories. In Motion.
+        </Text>
+        <Text
+          position={[0, -0.6, 0]}
+          fontSize={viewport.width > 6 ? 0.2 : 0.15}
+          color="#a3a3a3"
+          anchorX="center"
+          anchorY="top"
+          font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
+          fontWeight="medium"
+        >
+          @ripplemedia.us
+        </Text>
+
+        {/* Bubbles */}
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Bubble key={i} viewport={viewport} />
+        ))}
+      </group>
+
+      {/* Post-Processing Plane - Rendered to Screen */}
+      <mesh ref={planeRef} position={[0, 0, 1]}>
+        <planeGeometry args={[viewport.width, viewport.height]} />
+        {/* @ts-expect-error - waterRippleMaterial is not a standard element */}
+        <waterRippleMaterial ref={materialRef} transparent />
+      </mesh>
+    </>
+  );
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Bubble = ({ viewport }: { viewport: any }) => {
+  const ref = useRef<THREE.Mesh>(null);
+  const [speed] = useState(() => Math.random() * 2 + 1);
+  const [x] = useState(() => (Math.random() - 0.5) * viewport.width);
+
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.position.y += speed * 0.01;
+      ref.current.position.x = x + Math.sin(state.clock.elapsedTime + x) * 0.2;
+      if (ref.current.position.y > viewport.height / 2) {
+        ref.current.position.y = -viewport.height / 2;
+      }
+    }
+  });
+
+  return (
+    <mesh ref={ref} position={[x, -viewport.height / 2, 0]}>
+      <circleGeometry args={[Math.random() * 0.05 + 0.02, 16]} />
+      <meshBasicMaterial color="#4ade80" opacity={0.6} transparent />
+    </mesh>
+  );
+};
 
 export const WaterWaveSection: React.FC = () => {
   return (
-    <section className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-white to-neutral-100">
-      {/* SVG Water Wave Animation */}
-      <div className="absolute inset-0">
-        <svg
-          className="absolute bottom-0 w-full h-full"
-          viewBox="0 0 1200 800"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            {/* Water gradient */}
-            <linearGradient id="waterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="rgba(208, 254, 23, 0.3)" />
-              <stop offset="30%" stopColor="rgba(134, 239, 172, 0.6)" />
-              <stop offset="70%" stopColor="rgba(34, 197, 94, 0.8)" />
-              <stop offset="100%" stopColor="rgba(22, 163, 74, 1)" />
-            </linearGradient>
-            
-            {/* Wave border gradient */}
-            <linearGradient id="waveBorder" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="rgba(208, 254, 23, 0.9)" />
-              <stop offset="50%" stopColor="rgba(134, 239, 172, 0.7)" />
-              <stop offset="100%" stopColor="rgba(34, 197, 94, 0.5)" />
-            </linearGradient>
-
-            {/* Displacement filter for text distortion */}
-            <filter id="displacement" x="-20%" y="-20%" width="140%" height="140%">
-              <feTurbulence baseFrequency="0.02 0.1" numOctaves="3" seed="2" />
-              <feDisplacementMap in="SourceGraphic" scale="8" />
-            </filter>
-          </defs>
-
-          {/* Animated Wave Paths */}
-          <motion.path
-            d="M0,400 C300,350 600,450 900,400 C1050,375 1200,425 1200,400 L1200,800 L0,800 Z"
-            fill="url(#waterGradient)"
-            animate={{
-              d: [
-                "M0,400 C300,350 600,450 900,400 C1050,375 1200,425 1200,400 L1200,800 L0,800 Z",
-                "M0,420 C300,370 600,470 900,420 C1050,395 1200,445 1200,420 L1200,800 L0,800 Z",
-                "M0,400 C300,330 600,430 900,380 C1050,355 1200,405 1200,380 L1200,800 L0,800 Z",
-                "M0,400 C300,350 600,450 900,400 C1050,375 1200,425 1200,400 L1200,800 L0,800 Z"
-              ]
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-
-          {/* Secondary wave for depth */}
-          <motion.path
-            d="M0,450 C200,420 400,480 600,450 C800,420 1000,480 1200,450 L1200,800 L0,800 Z"
-            fill="url(#waterGradient)"
-            opacity="0.7"
-            animate={{
-              d: [
-                "M0,450 C200,420 400,480 600,450 C800,420 1000,480 1200,450 L1200,800 L0,800 Z",
-                "M0,470 C200,440 400,500 600,470 C800,440 1000,500 1200,470 L1200,800 L0,800 Z",
-                "M0,430 C200,400 400,460 600,430 C800,400 1000,460 1200,430 L1200,800 L0,800 Z",
-                "M0,450 C200,420 400,480 600,450 C800,420 1000,480 1200,450 L1200,800 L0,800 Z"
-              ]
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          />
-
-          {/* Wave border/foam effect */}
-          <motion.path
-            d="M0,400 C300,350 600,450 900,400 C1050,375 1200,425 1200,400"
-            fill="none"
-            stroke="url(#waveBorder)"
-            strokeWidth="4"
-            animate={{
-              d: [
-                "M0,400 C300,350 600,450 900,400 C1050,375 1200,425 1200,400",
-                "M0,420 C300,370 600,470 900,420 C1050,395 1200,445 1200,420",
-                "M0,400 C300,330 600,430 900,380 C1050,355 1200,405 1200,380",
-                "M0,400 C300,350 600,450 900,400 C1050,375 1200,425 1200,400"
-              ]
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </svg>
-      </div>
-
-      {/* Content above water */}
-      <div className="relative z-10 flex flex-col justify-center min-h-[60vh] px-6 md:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.h2
-            className="text-4xl md:text-6xl font-bold text-neutral-900 mb-6"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            Dive Into Your
-            <br />
-            <span className="bg-gradient-to-r from-green-600 to-primary bg-clip-text text-transparent">
-              Creative Vision
-            </span>
-          </motion.h2>
-          
-          <motion.p
-            className="text-lg md:text-xl text-neutral-600 mb-8 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            Let&apos;s create something extraordinary together. From concept to completion, 
-            we&apos;ll make waves in your industry.
-          </motion.p>
-
-          <motion.button
-            className="bg-primary hover:bg-primary/90 text-black font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300 hover:scale-105"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Start Your Project
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Underwater Content with Displacement Effect */}
-      <div className="absolute bottom-0 left-0 right-0 z-5">
-        <div className="relative h-96 bg-gradient-to-t from-green-800/80 to-transparent">
-          {/* Underwater text with distortion */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div
-              className="text-center text-white/60"
-              style={{ filter: "url(#displacement)" }}
-              animate={{
-                filter: [
-                  "url(#displacement)",
-                  "hue-rotate(10deg) url(#displacement)",
-                  "hue-rotate(-10deg) url(#displacement)",
-                  "url(#displacement)"
-                ]
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <h3 className="text-2xl md:text-4xl font-bold mb-4 opacity-70">
-                Submerged in Excellence
-              </h3>
-              <p className="text-sm md:text-lg opacity-50 max-w-md mx-auto">
-                Every project flows with precision and creativity, creating ripples of success
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Floating bubbles effect */}
-          <div className="absolute inset-0 overflow-hidden">
-            {[...Array(12)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute bg-white/20 rounded-full"
-                style={{
-                  width: Math.random() * 10 + 5,
-                  height: Math.random() * 10 + 5,
-                  left: `${Math.random() * 100}%`,
-                }}
-                animate={{
-                  y: [-20, -400],
-                  opacity: [0, 1, 0],
-                  scale: [0.5, 1, 0.5]
-                }}
-                transition={{
-                  duration: Math.random() * 4 + 3,
-                  repeat: Infinity,
-                  delay: Math.random() * 2,
-                  ease: "easeOut"
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Contact info overlay */}
-      <div className="absolute bottom-8 left-8 z-20">
-        <motion.div
-          className="bg-white/90 backdrop-blur rounded-2xl p-6 shadow-lg"
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          <h4 className="font-semibold text-neutral-900 mb-2">Ready to make waves?</h4>
-          <p className="text-sm text-neutral-600 mb-3">Get in touch today</p>
-          <div className="flex flex-col gap-1 text-sm">
-            <a href="mailto:hello@ripplemedia.com" className="text-primary hover:underline">
-              hello@ripplemedia.com
-            </a>
-            <a href="tel:+1234567890" className="text-primary hover:underline">
-              +1 (234) 567-890
-            </a>
-          </div>
-        </motion.div>
-      </div>
+    <section className="relative h-[50vh] w-full overflow-hidden bg-white">
+      <Canvas dpr={[1, 2]} gl={{ alpha: true }}>
+        <OrthographicCamera makeDefault position={[0, 0, 5]} zoom={100} />
+        <SceneContent />
+      </Canvas>
     </section>
   );
 };

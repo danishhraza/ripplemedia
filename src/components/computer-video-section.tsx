@@ -16,12 +16,12 @@ const lineClass = "font-normal text-black tracking-tight leading-[1] md:leading-
 
 export const ComputerVideoSection: React.FC = () => {
   return (
-  <section className="relative bg-neutral-100 py-24 overflow-hidden">
+    <section className="relative bg-neutral-100 py-24 overflow-hidden">
       {/* SVG Grain overlay (fallback removed CSS noise for reliability) */}
-  <GrainOverlay opacity={0.18} duration="11s" freqValues=".60;.63;.65;.67;.70;.66;.63;.60" animateSeed debugVisible />
-  <div className="relative z-10 max-w-[1500px] mx-auto px-4">
+      <GrainOverlay opacity={0.18} duration="11s" freqValues=".60;.63;.65;.67;.70;.66;.63;.60" animateSeed debugVisible />
+      <div className="relative z-10 max-w-[1500px] mx-auto px-4">
         {/* TEXT BLOCK */}
-  <div className="flex flex-col items-center text-center gap-[0.6em] md:gap-[1em]">
+        <div className="flex flex-col items-center text-center gap-[0.6em] md:gap-[1em]">
           <motion.p
             className={`text-[clamp(3.4rem,8.4vw,9.3rem)] ${lineClass} relative left-[9.5%] md:left-[-5.5%]`}
             initial={{ opacity: 0, y: 50 }}
@@ -70,6 +70,7 @@ export const ComputerVideoSection: React.FC = () => {
                 </video>
               </div>
             </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/computer.PNG"
               alt="Vintage computer"
@@ -103,7 +104,7 @@ export const ComputerVideoSection: React.FC = () => {
           initial={{ opacity: 0, scale: 0.82, y: -25 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.85, delay: 0.2, ease: [0.16,0.84,0.44,1] }}
+          transition={{ duration: 0.85, delay: 0.2, ease: [0.16, 0.84, 0.44, 1] }}
         >
           {/* Wrapper maintains aspect; percentages inside remain stable on resize */}
           <div className="relative w-fluid">
@@ -132,6 +133,7 @@ export const ComputerVideoSection: React.FC = () => {
               </div>
             </div>
             {/* COMPUTER IMAGE ABOVE */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/computer.PNG"
               alt="Vintage computer"

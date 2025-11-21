@@ -23,9 +23,9 @@ export const BackgroundRippleEffect = ({
       ref={ref}
       className={cn(
         "absolute inset-0 h-full w-full",
-  // Visible grid lines + subtle fill retained so ripple opacity animation shows.
-  "[--cell-border-color:rgba(0,0,0,0.35)] [--cell-fill-color:rgba(0,0,0,0.04)] [--cell-shadow-color:rgba(0,0,0,0.45)]",
-  "dark:[--cell-border-color:rgba(255,255,255,0.25)] dark:[--cell-fill-color:rgba(255,255,255,0.05)] dark:[--cell-shadow-color:rgba(255,255,255,0.12)]",
+        // Default colors (Neutral 300/100/500) for that subtle look
+        "[--cell-border-color:rgba(212,212,212,1)] [--cell-fill-color:rgba(245,245,245,1)] [--cell-shadow-color:rgba(115,115,115,1)]",
+        "dark:[--cell-border-color:rgba(64,64,64,1)] dark:[--cell-fill-color:rgba(23,23,23,1)] dark:[--cell-shadow-color:rgba(38,38,38,1)]",
       )}
     >
       <div className="relative h-auto w-auto overflow-hidden">
@@ -75,7 +75,7 @@ const DivGrid = ({
   borderColor = "#3f3f46",
   fillColor = "rgba(14,165,233,0.3)",
   clickedCell = null,
-  onCellClick = () => {},
+  onCellClick = () => { },
   interactive = true,
 }: DivGridProps) => {
   const cells = useMemo(
@@ -105,17 +105,16 @@ const DivGrid = ({
 
         const style: CellStyle = clickedCell
           ? {
-              "--delay": `${delay}ms`,
-              "--duration": `${duration}ms`,
-            }
+            "--delay": `${delay}ms`,
+            "--duration": `${duration}ms`,
+          }
           : {};
 
         return (
           <div
             key={idx}
             className={cn(
-              // Border emphasized; slight fill kept so opacity animation (ripple) is perceptible.
-              "cell relative border border-solid opacity-55 transition-opacity duration-150 will-change-transform hover:opacity-90 dark:shadow-[0px_0px_40px_1px_var(--cell-shadow-color)_inset]",
+              "cell relative border-[0.5px] opacity-40 transition-opacity duration-150 will-change-transform hover:opacity-80 dark:shadow-[0px_0px_40px_1px_var(--cell-shadow-color)_inset]",
               clickedCell && "animate-cell-ripple [animation-fill-mode:none]",
               !interactive && "pointer-events-none",
             )}

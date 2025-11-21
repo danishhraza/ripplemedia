@@ -1,7 +1,8 @@
 "use client"
-import React from 'react'
+import React, { useState } from 'react'
 import { GlowingEffect } from "@/components/ui/glowing-effect";
 import { Check, Star } from "lucide-react";
+import ContactModal from './contact-modal';
 
 interface PricingCardProps {
   title: string;
@@ -11,6 +12,7 @@ interface PricingCardProps {
   description: string;
   buttonText: string;
   popular?: boolean;
+  onContact: (packageTitle: string) => void;
 }
 
 const PricingCard: React.FC<PricingCardProps> = ({
@@ -20,7 +22,8 @@ const PricingCard: React.FC<PricingCardProps> = ({
   features,
   description,
   buttonText,
-  popular = false
+  popular = false,
+  onContact
 }) => {
   return (
     <div className="relative h-full">
@@ -33,7 +36,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
           inactiveZone={0.01}
           borderWidth={6}
         />
-        <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl p-6 md:p-8 bg-white/80 backdrop-blur border border-gray-200">
+        <div className="relative flex h-full flex-col justify-between gap-6 rounded-xl p-6 md:p-8 bg-white/80 backdrop-blur border border-gray-200">
           {/* Popular Badge */}
           {popular && (
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
@@ -43,14 +46,14 @@ const PricingCard: React.FC<PricingCardProps> = ({
               </div>
             </div>
           )}
-          
+
           {/* Header */}
           <div className="space-y-4">
             <div>
               <h3 className="text-2xl font-bold text-neutral-900">{title}</h3>
               <p className="text-sm text-neutral-600">{subtitle}</p>
             </div>
-            
+
             <div className="space-y-2">
               <div className="text-4xl font-bold text-neutral-900">
                 {price}
@@ -69,14 +72,17 @@ const PricingCard: React.FC<PricingCardProps> = ({
                 </li>
               ))}
             </ul>
-            
+
             <p className="text-sm text-neutral-600 pt-4 border-t border-gray-200">
               {description}
             </p>
           </div>
 
           {/* Button */}
-          <button className="w-full bg-primary hover:bg-primary/90 text-black font-semibold py-3 px-6 rounded-xl transition-colors">
+          <button
+            onClick={() => onContact(title)}
+            className="w-full bg-primary hover:bg-secondary text-black font-semibold py-3 px-6 rounded-xl transition-colors"
+          >
             {buttonText}
           </button>
         </div>
@@ -86,8 +92,16 @@ const PricingCard: React.FC<PricingCardProps> = ({
 };
 
 const Pricing: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedPackage, setSelectedPackage] = useState('')
+
+  const handleContact = (packageTitle: string) => {
+    setSelectedPackage(packageTitle)
+    setIsModalOpen(true)
+  }
+
   return (
-    <div className="relative min-h-screen w-full mt-20 bg-gradient-to-b from-white to-neutral-50">
+    <div id="pricing" className="relative min-h-screen w-full mt-20 bg-gradient-to-b from-white to-neutral-50">
       {/* Simple CSS Grid Background */}
       <div
         className="absolute inset-0 opacity-70"
@@ -99,10 +113,10 @@ const Pricing: React.FC = () => {
           backgroundSize: '40px 40px'
         }}
       />
-      
+
       {/* Top fade gradient */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white to-transparent z-10"></div>
-      
+
       {/* Bottom fade gradient */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white to-transparent z-10"></div>
 
@@ -120,33 +134,35 @@ const Pricing: React.FC = () => {
         {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto w-full pt-8">
           <PricingCard
-            title="Package 1"
-            price="$500"
-            subtitle="Short Reels & Photos"
+            title="Basic Coverage"
+            price="$80/hr"
+            subtitle="Photo / Short Video"
             features={[
-              "Short reel creation",
-              "Photo editing & retouching", 
-              "Professional editing",
-              "Multi-format delivery"
+              "Photo / Short Video",
+              "One Location",
+              "Quick Delivery",
+              "Best for event coverage, portrait shoot, individuals"
             ]}
-            description="Best for ads, personal shoots, events and social media content"
-            buttonText="Get Started"
+            description="Capture your moments with professional quality and quick turnaround."
+            buttonText="Contact Me"
+            onContact={handleContact}
           />
 
           <PricingCard
-            title="Package 2" 
-            price="$1,000"
-            subtitle="Complete Media Package"
+            title="Complete Package"
+            price="$500"
+            subtitle="Photo + Short Reels + Long Video"
             features={[
-              "Short reels & long videos",
-              "Professional photography",
-              "Drone shots & aerial footage",
-              "Complete post-production",
-              "Color grading & sound design"
+              "High Res Photos",
+              "Short Reels + Long Video",
+              "Multiple locations",
+              "Editing Included",
+              "Best for businesses or ad/product shoot"
             ]}
-            description="Best for events, real estate, professional ads and brand content"
-            buttonText="Get Started"
+            description="Comprehensive media coverage for your business or brand needs."
+            buttonText="Contact Me"
             popular={true}
+            onContact={handleContact}
           />
 
           <PricingCard
@@ -156,15 +172,21 @@ const Pricing: React.FC = () => {
             features={[
               "Custom video projects",
               "Web development services",
+              "App Development",
               "Social media management",
-              "Brand strategy consultation",
               "Long-term partnerships"
             ]}
             description="For more custom queries, development projects, and comprehensive social media management, reach out to me!"
             buttonText="Contact Me"
+            onContact={handleContact}
           />
         </div>
       </div>
+      <ContactModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        selectedPackage={selectedPackage}
+      />
     </div>
   )
 }
