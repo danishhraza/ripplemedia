@@ -128,19 +128,18 @@ const SceneContent = () => {
       <group ref={contentRef}>
         <Text
           position={[0, 0, 0]}
-          fontSize={viewport.width > 6 ? 1 : 0.5}
+          fontSize={viewport.width > 6 ? 1 : 0.35}
           color="black"
           anchorX="center"
           anchorY="middle"
-          // Using Inter font for stability
-          font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
-          fontWeight="bold"
+          // Using Coolvetica font
+          font="/fonts/Coolvetica Rg.otf"
         >
           Stories. In Motion.
         </Text>
         <Text
           position={[0, -0.6, 0]}
-          fontSize={viewport.width > 6 ? 0.2 : 0.15}
+          fontSize={viewport.width > 6 ? 0.2 : 0.1}
           color="#a3a3a3"
           anchorX="center"
           anchorY="top"
