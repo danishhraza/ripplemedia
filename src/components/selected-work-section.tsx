@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { motion, useInView, useScroll, useTransform } from "motion/react";
+import Link from "next/link";
 
 // Card type for grid items
 type Card = {
@@ -12,8 +13,8 @@ type Card = {
 };
 
 // Simple Video Player Component using direct URLs
-const VideoPlayer: React.FC<{ 
-  videoUrl?: string; 
+const VideoPlayer: React.FC<{
+  videoUrl?: string;
   autoplay?: boolean;
   muted?: boolean;
   showFullVideo?: boolean;
@@ -36,7 +37,7 @@ const VideoPlayer: React.FC<{
       className={`${showFullVideo
         ? "max-h-[85vh] max-w-[95vw] w-auto h-auto object-contain"
         : "w-full h-full object-cover"
-      } rounded-lg bg-black`}
+        } rounded-lg bg-black`}
       autoPlay={autoplay}
       loop
       muted={muted}
@@ -99,7 +100,7 @@ const LayoutGrid: React.FC<{ cards: Card[] }> = ({ cards }) => {
             >
               ✕
             </button>
-            
+
             {/* Full video with controls */}
             {selected.videoUrl ? (
               <VideoPlayer
@@ -218,6 +219,26 @@ export const SelectedWorkSection: React.FC = () => {
           }}
         >
           <LayoutGrid cards={videos} />
+        </motion.div>
+
+        {/* View All Button */}
+        <motion.div
+          className="flex justify-end mt-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{
+            duration: 0.6,
+            ease: "easeOut",
+            delay: 1.0,
+          }}
+        >
+          <Link
+            href="/projects"
+            className="group relative inline-flex items-center gap-2 text-sm md:text-base font-medium overflow-hidden"
+          >
+            <span className="relative z-10">View All</span>
+            <span className="absolute bottom-0 left-0 w-full h-[1px] bg-current transform origin-right scale-x-0 transition-transform duration-300 group-hover:scale-x-100 group-hover:origin-left"></span>
+          </Link>
         </motion.div>
       </div>
     </section>
