@@ -101,7 +101,7 @@ const Pricing: React.FC = () => {
   }
 
   return (
-    <div id="pricing" className="relative min-h-screen w-full mt-20 bg-gradient-to-b from-white to-neutral-50">
+    <div id="pricing" className="relative min-h-screen w-full mt-20 mb-10 bg-gradient-to-b from-white to-neutral-50">
       {/* Simple CSS Grid Background */}
       <div
         className="absolute inset-0 opacity-70"
@@ -122,7 +122,7 @@ const Pricing: React.FC = () => {
 
       <div className="relative z-50 flex flex-col items-center justify-center min-h-screen px-5">
         {/* Pricing Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <h1 className="text-4xl md:text-6xl font-bold text-neutral-900 mb-4">
             What will it cost?
           </h1>
@@ -132,7 +132,7 @@ const Pricing: React.FC = () => {
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto w-full pt-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto w-full pt-4">
           <PricingCard
             title="Basic Coverage"
             price="$80/hr"
@@ -144,7 +144,7 @@ const Pricing: React.FC = () => {
               "Best for event coverage, portrait shoot, individuals"
             ]}
             description="Capture your moments with professional quality and quick turnaround."
-            buttonText="Contact Me"
+            buttonText="Contact Us"
             onContact={handleContact}
           />
 
@@ -160,7 +160,7 @@ const Pricing: React.FC = () => {
               "Best for businesses or ad/product shoot"
             ]}
             description="Comprehensive media coverage for your business or brand needs."
-            buttonText="Contact Me"
+            buttonText="Contact Us"
             popular={true}
             onContact={handleContact}
           />
@@ -177,7 +177,7 @@ const Pricing: React.FC = () => {
               "Long-term partnerships"
             ]}
             description="For more custom queries, development projects, and comprehensive social media management, reach out to me!"
-            buttonText="Contact Me"
+            buttonText="Contact Us"
             onContact={handleContact}
           />
         </div>

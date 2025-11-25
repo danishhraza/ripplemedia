@@ -66,7 +66,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose, selectedPa
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold text-neutral-900">Get in Touch</DialogTitle>
                     <DialogDescription className="text-neutral-600">
-                        You selected <strong>{selectedPackage}</strong>. Fill out the form below or message me on Instagram.
+                        You selected <strong>{selectedPackage}</strong>. Fill out the form below or message us on Instagram.
                     </DialogDescription>
                 </DialogHeader>
 
