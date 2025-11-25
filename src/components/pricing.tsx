@@ -81,7 +81,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
           {/* Button */}
           <button
             onClick={() => onContact(title)}
-            className="w-full bg-primary hover:bg-secondary text-black font-semibold py-3 px-6 rounded-xl transition-colors"
+            className="w-full bg-primary hover:bg-primary/70 hover:cursor-pointer text-black font-semibold py-3 px-6 rounded-xl transition-colors"
           >
             {buttonText}
           </button>
@@ -124,10 +124,10 @@ const Pricing: React.FC = () => {
         {/* Pricing Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-neutral-900 mb-4">
-            Choose Your Package
+            What will it cost?
           </h1>
           <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-            Professional media services tailored to your needs
+            these are just rough estimates, hit us up!
           </p>
         </div>
 

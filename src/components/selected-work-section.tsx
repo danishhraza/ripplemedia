@@ -61,7 +61,7 @@ const LayoutGrid: React.FC<{ cards: Card[] }> = ({ cards }) => {
 
   return (
     <div className="w-full h-full">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[800px]">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[800px] md:h-[600px]">
         {cards.map((card) => (
           <motion.div
             key={card.id}
@@ -177,7 +177,7 @@ export const SelectedWorkSection: React.FC = () => {
 
   return (
     <section ref={ref} className="min-h-screen py-16 px-6 relative">
-      <div className="mx-auto md:mx-40">
+      <div className="mx-auto md:mx-52">
         {/* Title */}
         <div className="relative mb-8">
           <motion.h2

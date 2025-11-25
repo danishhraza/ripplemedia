@@ -112,7 +112,7 @@ export const ServicesSection: React.FC = () => {
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-neutral-500">Our Services</p>
           <h2 className="mt-2 text-3xl md:text-6xl font-semibold text-neutral-900 leading-tight">
-            We’re a creative team building services people remember
+            Which one are you after?
           </h2>
         </div>
 

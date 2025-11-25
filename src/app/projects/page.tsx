@@ -94,7 +94,7 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0], index: n
     return (
         <Link href={`/projects/${project.id}`} className="block">
             <motion.div
-                className="relative w-full aspect-[4/3] cursor-pointer group"
+                className="relative w-full aspect-[4/3] cursor-pointer group rounded-2xl overflow-hidden"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
@@ -111,7 +111,7 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0], index: n
 
                 {/* Main Image Container */}
                 <motion.div
-                    className="absolute overflow-hidden shadow-sm z-10"
+                    className="absolute overflow-hidden shadow-sm z-10 rounded-xl"
                     initial={{ top: "15%", bottom: "15%", left: "15%", right: "15%" }}
                     animate={{
                         top: "15%",

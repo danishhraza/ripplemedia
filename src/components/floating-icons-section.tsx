@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const icons = [
   { src: "/icons/envato-graphic-4414ab3c-b43e-41e5-9040-468eb7a07e63.png", alt: "Design Icon 2" },
-  {src: "/icons/envato-graphic-04ff51a2-8829-48f8-b4e9-613f978301fc.png", alt: "Microphone Icon"},
+  { src: "/icons/envato-graphic-04ff51a2-8829-48f8-b4e9-613f978301fc.png", alt: "Microphone Icon" },
   { src: "/icons/envato-graphic-2bf5e420-f0c1-4e5a-b230-af8aec77fe66.png", alt: "Design Icon 1" },
   { src: "/icons/envato-graphic-c4337602-437e-4095-9335-00b3a9ef3e24.png", alt: "Design Icon 3" },
 ];
@@ -82,14 +82,14 @@ export const FloatingIconsSection: React.FC = () => {
                   scale: 1.15,
                   y: -16,
                 }}
-                whileTap={{ 
+                whileTap={{
                   scale: 0.9,
                 }}
                 transition={{
                   // Hover/unhover transitions
                   scale: { duration: 0.3, ease: "easeOut" },
-                  y: { 
-                    duration: 3 + index * 0.5, 
+                  y: {
+                    duration: 3 + index * 0.5,
                     repeat: Infinity,
                     ease: "easeInOut",
                     delay: index * 0.2,
@@ -103,14 +103,14 @@ export const FloatingIconsSection: React.FC = () => {
                 }}
               >
                 {/* Enhanced glow effect */}
-                <motion.div 
+                <motion.div
                   className="absolute inset-0 bg-primary/20 rounded-full blur-lg opacity-0"
-                  whileHover={{ 
+                  whileHover={{
                     opacity: 0.6,
                   }}
                   transition={{ duration: 0.2 }}
                 />
-                
+
                 {/* Icon container */}
                 <div className="relative w-full h-full transition-shadow duration-300">
                   <Image
@@ -125,11 +125,6 @@ export const FloatingIconsSection: React.FC = () => {
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Decorative floating elements */}
-        <div className="absolute top-10 left-10 w-2 h-2 bg-secondary/50 rounded-full animate-pulse" />
-        <div className="absolute top-32 right-20 w-1 h-1 bg-secondary/50 rounded-full animate-ping" />
-        <div className="absolute bottom-20 left-1/4 w-3 h-3 bg-secondary/20 rounded-full animate-bounce" />
       </div>
     </section>
   );
