@@ -7,29 +7,17 @@
 import { useEffect, useRef } from 'react';
 import { createWaterFooter } from './water-footer-effect';
 
-const LINKS = ['Work', 'Services', 'About', 'Contact'];
-
-// Real destinations for the hidden nav — the site is a single-page layout,
-// so most of these are in-page anchors rather than standalone routes.
-const HREFS = {
-  work: '/projects',
-  services: '/#services',
-  about: '/',
-  contact: '/#pricing'
-};
-
 export default function WaterFooter({
   headline = 'Stories. In Motion.',
   sub = '@ripplemedia.us',
-  links = LINKS,
-  height = 460
+  height = 'clamp(300px, 70vw, 460px)'
 }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    const fx = createWaterFooter(canvasRef.current, { headline, sub, links });
+    const fx = createWaterFooter(canvasRef.current, { headline, sub });
     return () => fx.destroy();
-  }, [headline, sub, links]);
+  }, [headline, sub]);
 
   return (
     <footer style={{ position: 'relative', width: '100%', height, overflow: 'hidden' }}>
@@ -43,7 +31,6 @@ export default function WaterFooter({
       }}>
         <h2>{headline}</h2>
         <p>{sub}</p>
-        <nav>{links.map(l => <a key={l} href={HREFS[l.toLowerCase()] ?? `/${l.toLowerCase()}`}>{l}</a>)}</nav>
       </div>
     </footer>
   );

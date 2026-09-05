@@ -7,9 +7,9 @@ import * as THREE from 'three';
 const DEFAULTS = {
   headline: 'Stories. In Motion.',
   sub: '@ripplemedia.us',
-  links: ['Work', 'Services', 'About', 'Contact'],
-  headlineFont: '900 italic {size}px "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif',
-  bodyFont: '500 {size}px "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  links: [],
+  headlineFont: '{size}px "Coolvetica", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  bodyFont: '{size}px "Coolvetica", "Helvetica Neue", Helvetica, Arial, sans-serif',
   ink: '#0d1c05',
   inkLight: '#eef9d9',
   shallow: [0.80, 0.96, 0.27],   // lime at the waterline
@@ -37,7 +37,12 @@ export function createWaterFooter(canvas, options = {}) {
     return { splash() {}, destroy() { canvas.style.background = ''; } };
   }
 
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  // preserveDrawingBuffer: without it the browser is free to clear the canvas's
+  // GL buffer after any composite it isn't asked to refresh (e.g. while the
+  // render loop is paused below via the offscreen IntersectionObserver, or on
+  // a dropped frame) — which reads as a stray blank/garbled rectangle flashing
+  // over the footer until the next draw call catches up.
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setClearAlpha(0);
 
@@ -91,10 +96,23 @@ export function createWaterFooter(canvas, options = {}) {
     }
     tctx.globalAlpha = 1;
 
-    // snapshot the pixels once and hand three a plain typed array
+    // Snapshot the pixels into a *new* texture each time rather than mutating
+    // the existing one's .image in place: three.js keeps the old texture's
+    // upload path (texSubImage2D) once a texture has been uploaded once, and
+    // that path assumes the size never changes. Feeding it a differently-sized
+    // buffer overflows that assumption (GL_INVALID_VALUE: offset overflows
+    // texture dimensions) and briefly shows corrupted/garbage pixels; a new
+    // texture forces a full, correctly-sized re-upload instead.
     const px = tctx.getImageData(0, 0, tc.width, tc.height);
-    textTex.image = { data: new Uint8Array(px.data.buffer.slice(0)), width: tc.width, height: tc.height };
-    textTex.needsUpdate = true;
+    const tex = new THREE.DataTexture(new Uint8Array(px.data.buffer.slice(0)), tc.width, tc.height);
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.generateMipmaps = false;
+    tex.flipY = false;
+    tex.needsUpdate = true;
+    const prevTex = mat.uniforms.uText.value;
+    mat.uniforms.uText.value = tex;
+    if (prevTex) prevTex.dispose();
   }
 
   /* ---------- ripple simulation (ping-pong height field) ---------- */
@@ -298,6 +316,16 @@ export function createWaterFooter(canvas, options = {}) {
   });
   scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
 
+  /* ---------- render + loop timing (declared before resize, which renders once immediately) ---------- */
+  let raf = 0, t0 = performance.now(), nextDrop = t0 + 1200, running = true;
+  function nowT() { return ((performance.now() - t0) / 1000) * (reduced ? 0.25 : 1); }
+  function renderOnce(t) {
+    simStep();
+    mat.uniforms.uRipple.value = rtA.texture;
+    mat.uniforms.uTime.value = t;
+    renderer.render(scene, cam);
+  }
+
   /* ---------- sizing ---------- */
   let W = 1, H = 1, dpr = 1;
   let lastKey = '';
@@ -312,10 +340,23 @@ export function createWaterFooter(canvas, options = {}) {
     renderer.setSize(W, H, false);
     mat.uniforms.uRes.value.set(W, H);
     drawText(W, H, dpr);
+    // Resizing the canvas clears its WebGL drawing buffer; without an immediate
+    // repaint the browser can flash that cleared/garbage buffer for a frame
+    // (visible as a stray rectangle) until the next rAF tick catches up.
+    renderOnce(nowT());
   }
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
   resize();
+
+  // Coolvetica loads async; if it isn't ready yet, drawText() above fell back to a
+  // system font. Force one more text redraw once it's actually available.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      lastKey = '';
+      resize();
+    });
+  }
 
   /* ---------- interaction ---------- */
   let lastMove = 0, prev = null;
@@ -349,7 +390,6 @@ export function createWaterFooter(canvas, options = {}) {
   canvas.addEventListener('pointerdown', onDown);
 
   /* ---------- loop ---------- */
-  let raf = 0, t0 = performance.now(), nextDrop = t0 + 1200, running = true;
   function frame(now) {
     raf = requestAnimationFrame(frame);
     if (!running) return;
@@ -358,10 +398,7 @@ export function createWaterFooter(canvas, options = {}) {
       drop(0.15 + Math.random() * 0.7, 0.50 + Math.random() * 0.38, -0.03, 0.060);
       nextDrop = now + 6000 + Math.random() * 6000;
     }
-    simStep();
-    mat.uniforms.uRipple.value = rtA.texture;
-    mat.uniforms.uTime.value = t;
-    renderer.render(scene, cam);
+    renderOnce(t);
   }
   raf = requestAnimationFrame(frame);
 
@@ -376,7 +413,7 @@ export function createWaterFooter(canvas, options = {}) {
       canvas.removeEventListener('pointermove', onMove);
       canvas.removeEventListener('pointerdown', onDown);
       rtA.dispose(); rtB.dispose(); mat.dispose(); simMat.dispose();
-      textTex.dispose(); renderer.dispose();
+      mat.uniforms.uText.value?.dispose(); renderer.dispose();
     }
   };
 }
