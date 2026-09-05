@@ -4,6 +4,7 @@ import { SelectedWorkSection } from "@/components/selected-work-section";
 import { ServicesSection } from "@/components/services-section";
 import { FloatingIconsSection } from "@/components/floating-icons-section";
 import Pricing from "@/components/pricing";
+import WaterFooter from "@/components/water-footer/WaterFooter";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <ServicesSection />
       <FloatingIconsSection />
       <Pricing />
+      <WaterFooter />
     </div>
   );
 }

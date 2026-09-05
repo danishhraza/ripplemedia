@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Spectral } from "next/font/google";
-import WaterFooter from "@/components/water-footer/WaterFooter";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,7 +36,6 @@ export default function RootLayout({
   className={`${geistSans.variable} ${geistMono.variable} ${spectral.variable} antialiased`}
       >
         {children}
-        <WaterFooter />
       </body>
     </html>
   );
