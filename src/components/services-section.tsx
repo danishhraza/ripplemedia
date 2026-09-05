@@ -96,7 +96,7 @@ export const ServicesSection: React.FC = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-24 overflow-hidden md:h-svh">
+    <section id="services" ref={sectionRef} className="relative py-24 overflow-hidden md:h-svh">
       {/* Stronger full-width primary gradient background (edge-to-edge) */}
       <div
         aria-hidden
