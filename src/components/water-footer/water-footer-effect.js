@@ -223,8 +223,15 @@ export function createWaterFooter(canvas, options = {}) {
         float w1 = 0.38*sin(x*1.7 + t*0.72) + 0.17*sin(x*3.4 - t*1.02);
         float w2 = 0.32*sin(x*1.5 - t*0.58) + 0.14*sin(x*3.1 + t*0.86);
         float w3 = 0.26*sin(x*2.2 + t*0.46);
+        float sBoff = clamp(34.0*px, 0.065, 0.12);
         float s  = uSurface + w1 * amp + drag;                              // front crest
-        float sB = s - clamp(34.0*px, 0.065, 0.12) + (w2 - w1) * amp * 0.9; // underside of the sheet
+        float sB = s - sBoff + (w2 - w1) * amp * 0.9;                       // underside of the sheet
+        // sheet (below) is smoothstep(sB, s, uv.y), and smoothstep is undefined
+        // when edge0 >= edge1. The wobble term can outrun sBoff: at a 460px
+        // canvas the gap is 0.0739 while abs(w2-w1)*amp*0.9 peaks at 0.0790, so
+        // on rare alignments of the wave sines the edges invert, sheet saturates
+        // to 1.0 down the whole column, and the sheet/crest mixes paint it white.
+        sB = min(sB, s - sBoff * 0.25);
         float sF = s - clamp(66.0*px, 0.120, 0.20) + (w3 - w1) * amp * 0.8; // far fold behind it
 
         float depth = s - uv.y;
