@@ -5,10 +5,12 @@ import { ServicesSection } from "@/components/services-section";
 import { FloatingIconsSection } from "@/components/floating-icons-section";
 import Pricing from "@/components/pricing";
 import WaterFooter from "@/components/water-footer/WaterFooter";
+import LiquidIntro from "@/components/liquid-intro/LiquidIntro";
 
 export default function Home() {
   return (
     <div>
+      <LiquidIntro />
       <HeroSection />
       <ComputerVideoSection />
       <SelectedWorkSection />
