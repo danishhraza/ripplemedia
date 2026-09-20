@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Spectral } from "next/font/google";
 import "./globals.css";
-import { INTRO_SESSION_KEY } from "@/components/liquid-intro/intro-key";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,25 +31,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // The inline script below stamps data-intro-seen on <html> before React
-    // hydrates, which React would otherwise report as a server/client mismatch.
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
   className={`${geistSans.variable} ${geistMono.variable} ${spectral.variable} antialiased`}
       >
-        {/* Runs before the rest of the body is parsed: if the liquid intro has
-            already played this session (or the visitor asked for reduced
-            motion) it flags the document so CSS hides the overlay before the
-            first paint, instead of flashing a green band over the hero. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{
-  if(sessionStorage.getItem('${INTRO_SESSION_KEY}')||matchMedia('(prefers-reduced-motion: reduce)').matches){
-    document.documentElement.setAttribute('data-intro-seen','');
-  }
-}catch(e){}})();`
-          }}
-        />
         {children}
       </body>
     </html>
